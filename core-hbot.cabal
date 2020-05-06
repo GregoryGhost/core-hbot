@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cbfc9a5557968673b266614f62143314a1cb1a4252625e079d81f1ede247731e
+-- hash: d8df5dcadd86739b8cf77df4c63546b488b6616865b76e117db103fccf083f8d
 
 name:           core-hbot
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Logger
   other-modules:
       Paths_core_hbot
   hs-source-dirs:

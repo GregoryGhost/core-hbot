@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Logger (
     SimpleLog(..),
     doDebugLog,
@@ -8,9 +10,10 @@ module Logger (
 
 import Control.Monad.Reader
 import Control.Monad.IO.Class
+import GHC.Generics
 
-data LogLvl = Debug | Notice | Warn | Error
-    deriving (Show, Eq)
+data LogLvl = Debug | Notice | Warn | Error 
+    deriving (Show, Eq, Generic)
 
 type FileName = String
 type LogMsg = String
