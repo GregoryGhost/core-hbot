@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d8df5dcadd86739b8cf77df4c63546b488b6616865b76e117db103fccf083f8d
+-- hash: f99dfc8c644dc88b75d180d2f31e5c413f9af67a65310a569c672c77dd8ac21b
 
 name:           core-hbot
 version:        0.1.0.0
@@ -36,6 +36,7 @@ library
   build-depends:
       base >=4.7 && <5
     , mtl <=2.2.2
+    , time <=1.9.3
   default-language: Haskell2010
 
 executable core-hbot-exe
@@ -49,6 +50,7 @@ executable core-hbot-exe
       base >=4.7 && <5
     , core-hbot
     , mtl <=2.2.2
+    , time <=1.9.3
   default-language: Haskell2010
 
 test-suite core-hbot-test
@@ -63,4 +65,5 @@ test-suite core-hbot-test
       base >=4.7 && <5
     , core-hbot
     , mtl <=2.2.2
+    , time <=1.9.3
   default-language: Haskell2010

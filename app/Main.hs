@@ -1,9 +1,6 @@
 module Main where
 
-import Lib
-import Control.Monad.Except
-
-import System.Exit
+import Logger
 
 main :: IO ()
 main = undefined
