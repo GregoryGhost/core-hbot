@@ -10,12 +10,19 @@ module Logger (
     doNoticeLog,
     doWarnLog,
     doErrorLog,
+    genLogFile,
+    closeLog
 ) where
 
 import Control.Monad.Reader
 import Control.Monad.IO.Class
 import GHC.Generics
 import Data.Time
+import System.IO
+import System.Directory
+import System.FilePath
+import Control.Applicative
+import Control.Concurrent (newMVar, withMVar)
 
 data LogLvl = Debug | Notice | Warn | Error 
     deriving (Show, Eq, Generic)
@@ -23,8 +30,7 @@ data LogLvl = Debug | Notice | Warn | Error
 type FileName = String
 type LogMsg = String
 
-type CommonLog m = (MonadIO m) => LogLvl -> FilePath -> LogMsg -> m ()
-type SimpleLog m = MonadIO m => LogMsg -> m ()
+type SimpleLog m = MonadIO m => Handle -> LogMsg -> m ()
 
 pureLog :: LogLvl -> LogMsg -> UTCTime -> String
 pureLog lvl msg time = logTime ++ s ++ logLvl ++ s ++ msg 
@@ -33,36 +39,38 @@ pureLog lvl msg time = logTime ++ s ++ logLvl ++ s ++ msg
         logLvl = show lvl
         logTime = show time
 
-doCommonLog :: CommonLog m
-doCommonLog lvl path msg = write path pureLog
-    where write msg = undefined
+doLog :: MonadIO m => LogLvl -> Handle -> LogMsg -> m ()
+doLog lvl fileHandle msg = do
+    mutex <- liftIO $ newMVar ()
+    time <- liftIO getCurrentTime
 
-doLog :: MonadIO m => LogLvl -> LogMsg -> m ()
-doLog lvl msg = do
-    path <- genLogFileName
-    m <- doCommonLog lvl path msg
-    pure m
+    let logMsg = pureLog lvl msg time
+    log <- liftIO $ withMVar mutex (\() -> hPutStrLn fileHandle logMsg)
+
+    pure log 
 
 getTime :: (MonadIO m) => m Day
 getTime = do
     t <- liftIO getCurrentTime
     let today = utctDay t
+
     pure today
 
-genLogFileName :: (MonadIO m) => m String
-genLogFileName = do
+genLogFile :: (MonadIO m) => m Handle
+genLogFile = do
     time <- show <$> getTime
     let fileName = "log_" ++ time ++ ".log"
-    pure fileName
+    currentDir <- liftIO getCurrentDirectory
+    let filePath = currentDir </> fileName
+    fileHandler <- liftIO $ openFile filePath WriteMode
 
-doDebugLog :: SimpleLog m
+    pure fileHandler
+
+closeLog :: (MonadIO m) => Handle -> m ()
+closeLog = liftIO . hClose
+
+doDebugLog, doNoticeLog, doWarnLog, doErrorLog :: SimpleLog m
 doDebugLog = doLog Debug
-
-doNoticeLog :: SimpleLog m
 doNoticeLog = doLog Notice
-
-doWarnLog :: SimpleLog m
 doWarnLog = doLog Warn
-
-doErrorLog :: SimpleLog m
 doErrorLog = doLog Error
