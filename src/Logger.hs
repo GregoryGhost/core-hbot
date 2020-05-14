@@ -4,14 +4,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Logger (
-    SimpleLog(..),
     LogLvl(..),
     doDebugLog,
     doNoticeLog,
     doWarnLog,
     doErrorLog,
-    genLogFile,
-    closeLog
+    withLog
 ) where
 
 import Control.Monad.Reader
@@ -23,23 +21,24 @@ import System.Directory
 import System.FilePath
 import Control.Applicative
 import Control.Concurrent (newMVar, withMVar)
+import Control.Exception (bracket)
 
 data LogLvl = Debug | Notice | Warn | Error 
     deriving (Show, Eq, Generic)
 
-type FileName = String
 type LogMsg = String
 
-type SimpleLog m = MonadIO m => Handle -> LogMsg -> m ()
-
-pureLog :: LogLvl -> LogMsg -> UTCTime -> String
+pureLog :: LogLvl 
+    -> LogMsg 
+    -> UTCTime 
+    -> LogMsg
 pureLog lvl msg time = logTime ++ s ++ logLvl ++ s ++ msg 
     where
         s = " : "
         logLvl = show lvl
         logTime = show time
 
-doLog :: MonadIO m => LogLvl -> Handle -> LogMsg -> m ()
+doLog :: LogLvl -> Handle -> LogMsg -> IO ()
 doLog lvl fileHandle msg = do
     mutex <- liftIO $ newMVar ()
     time <- liftIO getCurrentTime
@@ -66,11 +65,14 @@ genLogFile = do
 
     pure fileHandler
 
-closeLog :: (MonadIO m) => Handle -> m ()
-closeLog = liftIO . hClose
-
-doDebugLog, doNoticeLog, doWarnLog, doErrorLog :: SimpleLog m
+doDebugLog, doNoticeLog, doWarnLog, doErrorLog :: 
+        Handle 
+        -> LogMsg
+        -> IO ()
 doDebugLog = doLog Debug
 doNoticeLog = doLog Notice
 doWarnLog = doLog Warn
 doErrorLog = doLog Error
+
+withLog :: (Handle -> IO a) -> IO a
+withLog f = bracket genLogFile hClose f
