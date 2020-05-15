@@ -62,6 +62,7 @@ genLogFile = do
     currentDir <- liftIO getCurrentDirectory
     let filePath = currentDir </> fileName
     fileHandler <- liftIO $ openFile filePath WriteMode
+    buffering <- liftIO $ hSetBuffering fileHandler NoBuffering
 
     pure fileHandler
 

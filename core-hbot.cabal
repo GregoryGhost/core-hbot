@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8a0c29e974929c6f920f328fbbebe5f00880cfffd46b2b5398b81457b44bdceb
+-- hash: cca9a7835c7d334a87d0a72aca0891e5123c4f5c2a279453f344f8b65a1c766d
 
 name:           core-hbot
 version:        0.1.0.0
@@ -34,10 +34,12 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      QuickCheck <=2.13.2
+    , base >=4.7 && <5
     , directory <=1.3.6.0
     , filepath <=1.4.2.1
     , mtl <=2.2.2
+    , quickcheck-instances <=0.3.22
     , time <=1.9.3
   default-language: Haskell2010
 
@@ -49,11 +51,13 @@ executable core-hbot-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck <=2.13.2
+    , base >=4.7 && <5
     , core-hbot
     , directory <=1.3.6.0
     , filepath <=1.4.2.1
     , mtl <=2.2.2
+    , quickcheck-instances <=0.3.22
     , time <=1.9.3
   default-language: Haskell2010
 
@@ -66,10 +70,12 @@ test-suite core-hbot-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck <=2.13.2
+    , base >=4.7 && <5
     , core-hbot
     , directory <=1.3.6.0
     , filepath <=1.4.2.1
     , mtl <=2.2.2
+    , quickcheck-instances <=0.3.22
     , time <=1.9.3
   default-language: Haskell2010
