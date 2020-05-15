@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Logger (
+module HBot.Core.Logger (
     LogLvl(..),
     doDebugLog,
     doNoticeLog,

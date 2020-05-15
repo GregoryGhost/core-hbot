@@ -1,6 +1,6 @@
 module Main where
 
-import Logger
+import HBot.Core.Logger
 
 import Control.Concurrent
 
