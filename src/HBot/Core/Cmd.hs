@@ -24,7 +24,7 @@ instance Read BasicCmd where
 data ResponseError = TestError | TestError2
 data ParseError = PError | PError2
 data Response = String
-type ParsedCmd c = Either ParseError (BotCmd c)
+type ParsedCmd c = Either ParseError с
 type BotResponse = Either ResponseError Response
 type ParsedPayload = Either ParseError Cmd
 type SourceCmd = String
