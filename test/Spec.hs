@@ -1,6 +1,9 @@
-import Lib
+{-# LANGUAGE OverloadedStrings #-}
+
 import Test.QuickCheck
 import Test.QuickCheck.Instances
+import HBot.Core.BasicCmd
+import HBot.Core.Cmd
 
 prop_sumInvariant a b = sum_ab == sum_ba
  where 
@@ -12,5 +15,8 @@ sum2 a b = a + b
 
 main :: IO ()
 main = do
- quickCheckWith stdArgs { maxSuccess = 1000} prop_sumInvariant
- putStrLn "done!"
+    -- quickCheckWith stdArgs { maxSuccess = 1000} prop_sumInvariant
+    -- putStrLn "done!"
+    --TODO: write some test cases
+    putStrLn =<< interpret botCmd Test where
+        botCmd = BotCmd { cmd = Help, args = [] }
