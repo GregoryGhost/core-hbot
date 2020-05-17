@@ -1,32 +1,13 @@
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
-
 module HBot.Core.Cmd where
-import Text.Read
+
+import Text.Read as T
 import Control.Monad.IO.Class
+import Control.Monad.Catch
 
-data BasicCmd = Test | Help | Echo | LastCmd deriving Show
+data BasicCmd = Help deriving Show
 
---TODO: rewrite on BotCmdParser
-instance Read BasicCmd where
-    readsPrec _ input = toReadS parsed where 
-        toReadS x = case x of (Just x) -> [(x, "")]; _ -> [];
-        parsed :: Maybe BasicCmd
-        parsed = case input of
-            "/test" -> Just Test
-            "/help" -> Just Help
-            "/echo" -> Just Echo
-            "/lst_cmd" -> Just LastCmd
-            _ -> Nothing
-
---TODO: rewrite
---NOTE: draft impl for prototype
-data ResponseError = TestError | TestError2
-data ParseError = PError | PError2
-data Response = String
-type ParsedCmd c = Either ParseError с
-type BotResponse = Either ResponseError Response
-type ParsedPayload = Either ParseError Cmd
+type ParseError = String
+type Response = String
 type SourceCmd = String
 type SourcePayload = String
 data Cmd = Cmd
@@ -37,16 +18,19 @@ data Cmd = Cmd
 type CmdArg = String
 type CmdArgs = [CmdArg]
 
-data BotCmd c where
-    BotCmd :: { cmd :: c, args :: CmdArgs} -> BotCmd c
+data BotCmd c = BotCmd { cmd :: c, args :: CmdArgs}
 
 class BotCmdParser c where
-    parsePayload :: SourcePayload -> ParsedPayload
-    getBotCmd :: SourceCmd -> ParsedCmd c
-    
-    parse :: SourcePayload -> ParsedCmd c
-    parse source = do
-        parsedPayload <- parsePayload source
+    getBotCmd :: MonadThrow m => SourceCmd -> m c
+
+    parsePayload :: MonadThrow m 
+        => c
+        -> SourcePayload
+        -> m Cmd
+
+    parse :: MonadThrow m => c -> SourcePayload -> m (BotCmd c)
+    parse tCmd source = do
+        parsedPayload <- parsePayload tCmd source
         botCmd <- getBotCmd $ getCmd parsedPayload
         let cmdArgs = getArgs parsedPayload
         let parsedCmd = BotCmd { cmd = botCmd, args = cmdArgs }
@@ -54,11 +38,16 @@ class BotCmdParser c where
         pure parsedCmd
 
 class (BotCmdParser cmd) => BotInterpreter cmd where
-    run :: MonadIO m => SourcePayload -> m BotResponse
-    run source = do
-        botCmd <- parse source
-        result <- liftIO $ interpret botCmd
+    run :: (MonadIO m, MonadThrow m)
+        => cmd
+        -> SourcePayload 
+        -> m Response
+    run cmd source = do
+        botCmd <- parse cmd source
+        result <- interpret botCmd
 
         pure result
 
-    interpret :: BotCmd cmd -> IO BotResponse
+    interpret :: (MonadIO m, MonadThrow m)
+        => BotCmd cmd 
+        -> m Response

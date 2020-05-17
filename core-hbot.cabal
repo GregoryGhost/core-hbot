@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2ae443547db8de619c5072ab44f35181ad5dc50f4150bd4074af075cddff87de
+-- hash: 6bdeac5632dbbe6c9b5bff3f201fbcba3644bdd7dd0bbd1766f645af6238a0db
 
 name:           core-hbot
 version:        0.1.0.0
@@ -29,7 +29,6 @@ library
   exposed-modules:
       HBot.Core.Cmd
       HBot.Core.Logger
-      Lib
   other-modules:
       Paths_core_hbot
   hs-source-dirs:
@@ -38,6 +37,7 @@ library
       QuickCheck <=2.13.2
     , base >=4.7 && <5
     , directory <=1.3.6.0
+    , exceptions >=0.8.3
     , filepath <=1.4.2.1
     , mtl <=2.2.2
     , quickcheck-instances <=0.3.22
@@ -56,6 +56,7 @@ executable core-hbot-exe
     , base >=4.7 && <5
     , core-hbot
     , directory <=1.3.6.0
+    , exceptions >=0.8.3
     , filepath <=1.4.2.1
     , mtl <=2.2.2
     , quickcheck-instances <=0.3.22
@@ -75,6 +76,7 @@ test-suite core-hbot-test
     , base >=4.7 && <5
     , core-hbot
     , directory <=1.3.6.0
+    , exceptions >=0.8.3
     , filepath <=1.4.2.1
     , mtl <=2.2.2
     , quickcheck-instances <=0.3.22
