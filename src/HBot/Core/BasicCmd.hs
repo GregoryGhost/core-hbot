@@ -12,11 +12,6 @@ data BasicCmd = Help deriving Show
 data Messanger = Test
 
 instance BotCmdParser BasicCmd Messanger where
-    parsePayload :: MonadThrow m 
-        => cmd
-        -> client
-        -> SourcePayload
-        -> m Cmd
     parsePayload _ _ source = do
         let splitted = Prelude.map T.unpack $ T.words $ T.pack source
         case Prelude.length splitted of 
@@ -25,9 +20,5 @@ instance BotCmdParser BasicCmd Messanger where
                             getArgs = Prelude.tail splitted }
 
 instance BotInterpreter BasicCmd Messanger where
-    interpret :: (MonadIO m, MonadThrow m)
-        => BotCmd cmd
-        -> client
-        -> m Response
-    --TODO:
-    interpret BotCmd { cmd = Help } _ = pure "help me =)"
+    interpret BotCmd { cmd = Help } _ = 
+        pure "use this command to getting bot help"
