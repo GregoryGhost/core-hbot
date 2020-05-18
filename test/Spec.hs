@@ -13,10 +13,17 @@ prop_sumInvariant a b = sum_ab == sum_ba
 sum2 :: Double -> Double -> Double
 sum2 a b = a + b
 
+ePrint = putStrLn . show
+
 main :: IO ()
 main = do
     -- quickCheckWith stdArgs { maxSuccess = 1000} prop_sumInvariant
     -- putStrLn "done!"
     --TODO: write some test cases
-    putStrLn =<< interpret botCmd Test where
-        botCmd = BotCmd { cmd = Help, args = [] }
+    let botCmd = BotCmd { cmd = Help, args = [] :: [String] }
+    test <- eval botCmd :: IO BasicCmd
+    ePrint test
+    
+    let kekCmd = BotCmd { cmd = Kek, args = [] :: [String] }
+    kek <- eval kekCmd :: IO BasicCmd
+    ePrint kek

@@ -12,16 +12,11 @@ import Data.Typeable
 type Response = String
 type SourceCmd = String
 type SourcePayload = String
-type ExpectedCmd = String
-data Cmd = Cmd
-    {
-        getCmd :: SourceCmd
-        , getArgs :: CmdArgs
-    } deriving Show
+type ExpectedType = String
 type CmdArg = String
 type CmdArgs = [CmdArg]
 
-data BotCmd c = BotCmd { cmd :: c, args :: CmdArgs}
+data BotCmd c a = BotCmd { cmd :: c, args :: [a] }
 
 data ParseError = NoCmd | UnknownBotCmd
     deriving Typeable
@@ -32,54 +27,33 @@ instance Show ParseError where
 
 instance Exception ParseError
 
-class BotCmdParser cmd client where
-    getBotCmd :: MonadThrow m
-        => cmd
-        -> client 
-        -> SourceCmd 
-        -> ExpectedCmd
-        -> m cmd
-    getBotCmd tCmd tClient sourceCmd expectedCmd = 
-        convert . unpack . toLower . pack $ sourceCmd where
-        convert cmd
-            | cmd == expectedCmd = pure tCmd 
-            | otherwise = throwM UnknownBotCmd
-
-    parsePayload :: MonadThrow m 
-        => cmd
-        -> client
-        -> SourcePayload
-        -> m Cmd
-
+class BotCmdParser cmd args client where
     parse :: MonadThrow m 
         => cmd
+        -> args
         -> client
         -> SourcePayload
-        -> ExpectedCmd
-        -> m (BotCmd cmd)
-    parse tCmd tClient source expectedCmd = do
-        parsedPayload <- parsePayload tCmd tClient source
-        let sourceCmd = getCmd parsedPayload
-        botCmd <- getBotCmd tCmd tClient sourceCmd expectedCmd
-        let sourceArgs = getArgs parsedPayload
-        let parsedCmd = BotCmd { cmd = botCmd, args = sourceArgs }
+        -> m (BotCmd cmd args)
 
-        pure parsedCmd
+class (Show expected) => PureEval cmd args expected where
+    eval :: (MonadThrow m) => BotCmd cmd args -> m expected
 
-class (BotCmdParser cmd client) => BotInterpreter cmd client where
+class (Show result, BotCmdParser cmd args client, PureEval cmd args result)
+    => BotInterpreter cmd args result client where
+
     run :: (MonadIO m, MonadThrow m)
         => cmd
+        -> args
         -> client
         -> SourcePayload
-        -> ExpectedCmd
-        -> m Response
-    run tCmd tClient source expectedCmd = do
-        botCmd <- parse tCmd tClient source expectedCmd
-        result <- interpret botCmd tClient
+        -> m result
+    run tCmd tArgs tClient source = do
+        cmd <- parse tCmd tArgs tClient source
 
-        pure result
+        interpret cmd tClient
 
-    interpret :: (MonadIO m, MonadThrow m)
-        => BotCmd cmd
+    interpret :: (MonadIO m, MonadThrow m, Show result)
+        => BotCmd cmd args
         -> client
-        -> m Response
+        -> m result
+    interpret cmd _ = eval cmd
