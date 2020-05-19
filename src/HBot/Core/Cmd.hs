@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE GADTs #-}
 
 module HBot.Core.Cmd where
 
@@ -16,7 +17,8 @@ type ExpectedType = String
 type CmdArg = String
 type CmdArgs = [CmdArg]
 
-data BotCmd c a = BotCmd { cmd :: c, args :: [a] }
+data BotCmd c a where
+    BotCmd :: Cmd c a => { cmd :: c, args :: [a] } -> BotCmd c a
 
 data ParseError = NoCmd | UnknownBotCmd
     deriving Typeable
@@ -27,6 +29,9 @@ instance Show ParseError where
 
 instance Exception ParseError
 
+class (Show a, Typeable a) => Interpretable a
+class (Interpretable cmd, Interpretable args) => Cmd cmd args
+
 class BotCmdParser cmd args client where
     parse :: MonadThrow m 
         => cmd
@@ -35,7 +40,9 @@ class BotCmdParser cmd args client where
         -> SourcePayload
         -> m (BotCmd cmd args)
 
-class (Show expected) => PureEval cmd args expected where
+class (Show expected)
+    => PureEval cmd args expected where
+    
     eval :: (MonadThrow m) => BotCmd cmd args -> m expected
 
 class (Show result, BotCmdParser cmd args client, PureEval cmd args result)
