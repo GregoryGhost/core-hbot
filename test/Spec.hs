@@ -2,7 +2,7 @@
 
 import Test.QuickCheck
 import Test.QuickCheck.Instances
-import HBot.Core.BasicCmd
+import HBot.Core.BasicCmd (TestCc, getHelp)
 import HBot.Core.Cmd
 
 prop_sumInvariant a b = sum_ab == sum_ba
@@ -20,10 +20,11 @@ main = do
     -- quickCheckWith stdArgs { maxSuccess = 1000} prop_sumInvariant
     -- putStrLn "done!"
     --TODO: write some test cases
-    let botCmd = BotCmd { cmd = Help, args = [] :: [String] }
-    test <- eval botCmd :: IO BasicCmd
-    ePrint test
+    -- let botCmd = BotCmd { cmd = Help, args = [] :: [String] }
+    -- test <- eval botCmd :: IO BasicCmd
+    -- ePrint test
     
-    let kekCmd = BotCmd { cmd = Kek, args = [] :: [String] }
-    kek <- eval kekCmd :: IO BasicCmd
-    ePrint kek
+    -- let kekCmd = BotCmd { cmd = Kek, args = [] :: [String] }
+    -- kek <- eval kekCmd :: IO BasicCmd
+    -- ePrint kek
+    ePrint . getHelp $ testCc TestCc

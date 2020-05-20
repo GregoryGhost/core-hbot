@@ -38,6 +38,9 @@ executables:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
+    # - -Wall
+    # - -Werror
+    # - -fwarn-incomplete-uni-patterns
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
