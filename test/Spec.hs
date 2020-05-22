@@ -2,8 +2,9 @@
 
 import Test.QuickCheck
 import Test.QuickCheck.Instances
-import HBot.Core.BasicCmd (TestCc, getHelp)
+import HBot.Core.BasicCmd
 import HBot.Core.Cmd
+import Data.Void
 
 prop_sumInvariant a b = sum_ab == sum_ba
  where 
@@ -12,8 +13,6 @@ prop_sumInvariant a b = sum_ab == sum_ba
 
 sum2 :: Double -> Double -> Double
 sum2 a b = a + b
-
-ePrint = putStrLn . show
 
 main :: IO ()
 main = do
@@ -27,4 +26,4 @@ main = do
     -- let kekCmd = BotCmd { cmd = Kek, args = [] :: [String] }
     -- kek <- eval kekCmd :: IO BasicCmd
     -- ePrint kek
-    ePrint . getHelp $ testCc TestCc
+    print . getHelp . cmd $ BotCmd { cmd = Help, args = [] :: [String] }

@@ -2,6 +2,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module HBot.Core.Cmd where
 
@@ -9,6 +10,7 @@ import Control.Monad.IO.Class
 import Control.Monad.Catch
 import Data.Text
 import Data.Typeable
+
 
 type Response = String
 type SourceCmd = String
@@ -31,6 +33,9 @@ instance Exception ParseError
 
 class (Show a, Typeable a) => Interpretable a
 class (Interpretable cmd, Interpretable args) => Cmd cmd args
+class (Enum cmd, Bounded cmd, Show cmd) => Helpeable cmd where
+    getHelp :: cmd -> String
+    getHelp _ = Prelude.unlines $ Prelude.map show [(minBound :: cmd) ..]
 
 class BotCmdParser cmd args client where
     parse :: MonadThrow m 
